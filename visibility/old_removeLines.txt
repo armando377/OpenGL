@@ -1,0 +1,50 @@
+    std::vector<float> newLines = lines;
+    vec3 color;
+    Point startPoint, endPoint;
+    int eraseCount = 0;
+    for(int i = 0;i < lines.size();i += 6)
+    {
+        for(int k = 0;k < 2;k++)
+        {
+            startPoint.x = lines[i];
+            startPoint.y = lines[i + 1];
+            endPoint.x = lines[i + 3];
+            endPoint.y = lines[i + 4];            
+            for(int j = 1;j < 4;j++)
+            {
+                Point middlePoint((startPoint.x + endPoint.x)/2.0f, (startPoint.y + endPoint.y)/2.0f);
+                Point newMiddlePoint = convertToScreen(middlePoint);
+                glReadPixels(newMiddlePoint.x, newMiddlePoint.y, 1, 1, GL_RGB, GL_FLOAT, &color);
+                // Si el color del pixel en el punto medio es negro, eliminamos los puntos de inicio y fin de esta línea.
+                // Pero si ese pixel está en la frontera del obstáculo, conservamos la línea.
+                if(color[0] == 0.0f && color[1] == 0.0f && color[2] == 0.0f)
+                {
+                    glReadPixels(newMiddlePoint.x + 1, newMiddlePoint.y, 1, 1, GL_RGB, GL_FLOAT, &color);
+                    if(color[0] == 0.0f && color[1] == 0.0f && color[2] == 0.0f)
+                    {
+                        glReadPixels(newMiddlePoint.x - 1, newMiddlePoint.y, 1, 1, GL_RGB, GL_FLOAT, &color);
+                        if(color[0] == 0.0f && color[1] == 0.0f && color[2] == 0.0f)
+                        {
+                            glReadPixels(newMiddlePoint.x, newMiddlePoint.y + 1, 1, 1, GL_RGB, GL_FLOAT, &color);
+                            if(color[0] == 0.0f && color[1] == 0.0f && color[2] == 0.0f)
+                            {
+                                glReadPixels(newMiddlePoint.x, newMiddlePoint.y - 1, 1, 1, GL_RGB, GL_FLOAT, &color);
+                                if(color[0] == 0.0f && color[1] == 0.0f && color[2] == 0.0f)
+                                {
+                                    newLines.erase(newLines.begin() + (i - eraseCount*6), newLines.begin() + (i - eraseCount*6 + 6));
+                                    eraseCount++;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                // if(k == 1)
+                //     endPoint = middlePoint;
+                // else
+                //     startPoint = middlePoint;
+                endPoint = middlePoint;
+            }           
+        }
+    }
+    return newLines;

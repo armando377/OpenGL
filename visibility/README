@@ -1,0 +1,11 @@
+Requisitos:
+-GLFW
+-GLAD
+-linmath.h
+-shaders.h (incluido en el repositorio)
+
+Para modificar el color de los objetos, deberás modificar los archivos .fs (la variable FragColor):
+    -robot.fs para el color del robot
+    -obstacle.fs para el color de los obstáculos
+    -draws.fs para el color del polígono de visibilidad
+Ten en cuenta que el algoritmo comprueba que el color de los obstáculos sea negro para la detección de colisiones.
